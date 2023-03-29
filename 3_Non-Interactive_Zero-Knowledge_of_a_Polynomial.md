@@ -10,6 +10,7 @@
   - [Modular Arithmetic](#modular-arithmetic)
   - [Strong Homomorphic Encryption](#strong-homomorphic-encryption)
   - [Encrypted Polynomial](#encrypted-polynomial)
+- [Restricting a Polynomial](#restricting-a-polynomial)
 
 <!-- /code_chunk_output -->
 
@@ -183,4 +184,26 @@ $$
     - 将加密后的s的幂发送给`证明者`：$ E(s^0),E(s^1),...,E(s^d) $
 * Prover
     - 计算多项式 $ h(x)=\frac{p(x)}{t(x)} $
-    - 
+    - 使用加密的幂 $ g^{s^0},g^{s^1},...,g^{s^d} $与系数 $ c_0,c_1,...,c_n $计算
+    $$
+    \begin{aligned}
+    E(p(s))&=g^{p(s)}\\
+    &={(g^{s^d})}^{c_d} \cdot\cdot\cdot {(g^{s^1})}^{c_1}\cdot {(g^{s^0})}^{c_0}\\
+    &=g^{c_d\cdot s^d + \cdot \cdot \cdot c_1\cdot s^1 + c_0\cdot s^0}
+    \end{aligned}
+    $$
+    类似的计算 $ E(h(s))=g^{h(s)} $
+    - 将计算结果 $ g^p,g^h $提供给`验证者`
+* Verifier
+    - 验证者在加密空间内检查 $ p=t(s)\cdot h $
+    $$
+    g^p={(g^h)}^{t(s)}\Rightarrow g^p=g^{t(s)\cdot h}
+    $$
+
+通过同态加密，我们将x=r这一步隐藏了起来，变为一个秘密值s，这样`证明者`无法任意的构造一个在s处有公共点的多项式，这样解决了上述方案的缺陷二。但是他仍然可以使用任意的方法来伪造一个证明，而无需实际使用所提供的s的幂的加密。
+* ~~验证者可能完全不知道声明的多项式 $ p(x) $,他可以计算 $ t=t(r) $,选择一个随机数h并且令 $ p=t\cdot h $,等式依然会成立，该陈述会被接受为有效。~~
+* ~~证明者知道随机点 $ x=r $,所以他可以构造任何在r处有一个公共点的多项式 $ t(r)\cdot h(r)$~~
+* 在最初的陈述中，Prover声称知道一个特定次数的多项式，在目前的协议中，不存在次数的限制。因此，证明者可以通过使用更高次的多项式来欺骗，该多项式也满足余因子检查
+
+## Restricting a Polynomial
+
